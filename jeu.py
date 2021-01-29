@@ -1,10 +1,12 @@
 import numpy as np
-import pygame as pg 
+import pygame as pg
+import random 
+from math import floor
 
 pg.init()
 salles = [(0,0,7,4), (6,5,5,6), (12,4,6,7)]
 couloirs = [ [(2,3),(2,8),(4,8),(4,7),(6,7)] , [(8,5),(8,1),(14,1),(14,4)] , [(10,8),(11,8),(11,7),(12,7)]]
-ennemies = set()
+ennemies = [ [[13,5],50] ]
 objets = set()
 taille_x = 20
 taille_y = 20
@@ -22,12 +24,27 @@ class player:
     
     def estPosstibleDeplacement(self,direction):
         i, j = np.array(self.position) + np.array(direction)
-        if self.niveau.etage.terrain[i][j] in [1,5,6]:
+        if self.niveau.etage.terrain[i][j] in [1,5,6,7]:
             return True
         return False
 
     def augmenterGold (self,nombreOr):
         self.gold += nombreOr
+
+    def creer_gold(self):
+        nbr = random.random()*10
+        if nbr < 3:
+            x = floor(1 + random.random()*5)
+            y = floor(1 + random.random()*2)
+            self.niveau.etage.terrain[x][y] = 7
+        elif nbr < 7:
+            x = floor(7 + random.random()*3)
+            y = floor(6 + random.random()*4)
+            self.niveau.etage.terrain[x][y] = 7
+        else:
+            x = floor(13 + random.random()*4)
+            y = floor(5 + random.random()*10)
+            self.niveau.etage.terrain[x][y] = 7
     
     def augmenterVie (self, gainVie):
         self.life += gainVie
@@ -61,10 +78,10 @@ def display(terrain):
     k,l = terrain.shape
     for i in range(k):
         for j in range(l):
-            x = 10*i
-            y = 10*j
-            width = 10
-            height = 10
+            x = 20*i
+            y = 20*j
+            width = 20
+            height = 20
             rect = pg.Rect(x,y,width,height)
             if terrain[i][j] == 0:
                 color = (0,0,0)
@@ -80,6 +97,8 @@ def display(terrain):
                 color = (255,128,0)
             if terrain[i][j] == 6:
                 color = (0,0,255)
+            if terrain[i][j] == 7:
+                color = (255,0,255)
             pg.draw.rect(screen,color,rect)
     pg.display.update()
     
@@ -91,11 +110,15 @@ class niveau:
         self.objets = objets
         self.ennemies = ennemies
         self.id = 0
+    
+    def afficher_ennemi(self,i): # Renvoie la valeur qui était à l'endroit position pour la garder en mémoire
+        a, b = self.ennemies[i][0][0], self.ennemies[i][0][1]
+        self.etage.terrain[a][b] = 7
 
 class etage:
     def __init__(self, salles, couloirs):
         self.terrain = np.zeros((taille_x,taille_y))
-        # 0 fait rien, 1 c'est . , 2 c'est -, 3 c'est |, 4 c'est @, 5 c'est couloir, 6 c'est porte
+        # 0 fait rien, 1 c'est . , 2 c'est -, 3 c'est |, 4 c'est @, 5 c'est couloir, 6 c'est porte, 7 c'est or
         self.salles = salles
         self.couloirs = couloirs
         self.remplir_terrain_salles()
@@ -126,7 +149,7 @@ class etage:
                 if axe == 1:
                     y_1 = min(self.couloirs[i][j][1],self.couloirs[i][j + 1][1])
                     y_2 = max(self.couloirs[i][j][1],self.couloirs[i][j + 1][1])
-                    x = self.couloirs[i][j][1]
+                    x = self.couloirs[i][j][0]
                     diff = y_2 - y_1
                     for k in range(diff + 1):
                         self.terrain[x][y_1 + k] = 5
@@ -160,7 +183,7 @@ class etage:
 
 joueur = player(100, 0,set(), 0, [1,1], objets, ennemies, taille_x, taille_y, salles, couloirs) 
 
-screen = pg.display.set_mode((taille_x*10, taille_y*10))
+screen = pg.display.set_mode((taille_x*20, taille_y*20))
 
 clock = pg.time.Clock()
 running = True
@@ -177,10 +200,27 @@ while running:
                 direction = [-1,0]
             elif event.key == pg.K_RIGHT:
                 direction = [1,0]
-            if joueur.estPosstibleDeplacement:
+            if joueur.estPosstibleDeplacement(direction):
                 joueur.deplacement(direction)
                 valeur = joueur.afficher_player()
+                vie_avant = joueur.life
+                for i, ennemi in enumerate(joueur.niveau.ennemies):
+                    joueur.niveau.afficher_ennemi(i)
+                    if (abs(ennemi[0][0]-joueur.position[0]) == 1) or (abs(ennemi[0][1]-joueur.position[1]) == 1):
+                        ennemi[1] -= 10 + 5*joueur.level
+                        joueur.life = joueur.life - 10
+                        if ennemi[1] <=0:
+                            joueur.niveau.etage.terrain[ennemi[0][0]][ennemi[0][1]] = 1
+                            joueur.niveau.ennemies.pop(i)
+                            joueur.level += 1
+                        if joueur.life <=0:
+                            quit()
+                if joueur.life == vie_avant:
+                    joueur.life += 5
+                    if joueur.life >= 100 + 10*joueur.level:
+                        joueur.life = 100 + 10*joueur.level
                 display(joueur.niveau.etage.terrain)
+                pg.display.set_caption(f"vie: {joueur.life}")
+                pg.display.set_caption(f"argent: {joueur.gold}")
                 joueur.remettre(valeur)
-
 pg.quit()
