@@ -8,18 +8,37 @@ joueur = player(100, 0,set(), 0, [0,[1,1]]) #position contient la donnée du niv
 
 class player:
 
-    def __init__(self,life, gold, inventory, level, position):
+    def __init__(self,life, gold, inventory, level, position, objets, ennemies, taille_x, taille_y, salles, couloirs):
         self.life = life
         self.gold = gold
         self.inventory = inventory
         self.level = level
         self.position = position
+        self.niveau = niveau(objets,ennemies,taille_x,taille_y, salles, couloirs)
     
-    def can_move(direction):
-        i, j = np.array(position[3]) + np.array(direction)
-        if niveaux[position[0]].etage.terrain[i][j] in [0,1]:
+    def can_move(self,direction):
+        i, j = np.array(self.position) + np.array(direction)
+        if self.niveau.etage.terrain[i][j] in [0,1]:
             return True
         return False
+
+    def augmenterGold (self,nombreOr):
+        self.gold += nombreOr
+    
+    def augmenterVie (self, gainVie):
+        self.life += gainVie
+
+    def perdreVie (self, perteVie):
+        self.life -= perteVie
+    
+    def augmenterLevel(self):
+        self.level += 1
+    
+    def deplacement(self, move) # move est une liste de deux éléments (ex : [1,0] si on se déplace à droite)
+        if estPosstibleDeplacement(move):
+            position[0]+=move[0]
+            position[1]+=move[1]
+    
 
     # ATTENTION appeler la fonction remplir terrain couloir APRES remplir terrain salle
 
@@ -47,20 +66,20 @@ def display(terrain):
 
 
 class niveau:
-    def __init__(etage, objets, ennemies, taille_x, taille_y):
-        self.etage = etage
+    def __init__(self, etage, objets, ennemies, taille_x, taille_y, salles, couloirs):
+        self.etage = etage(salles, couloirs)
         self.objets = objets
         self.ennemies = ennemies
         self.id = 0
 
 class etage:
-    def __init__(salles, couloirs):
+    def __init__(self, salles, couloirs):
         self.terrain = np.zeros((taille_x,taille_y))
         # 0 fait rien, 1 c'est . , 2 c'est -, 3 c'est |, 4 c'est @, 5 c'est couloir, 6 c'est porte
         self.salles = salles
         self.couloirs = couloirs
 
-    def remplir_terrain_couloir():
+    def remplir_terrain_couloir(self):
         #indice va commencer à 0 et finir un indice avant l'indice de fin d'un couloir
         def indice_qui_change(indice_couloir, indice_virage):
             x_1 = self.couloirs[indice_couloir][indice_virage][0]
@@ -99,7 +118,7 @@ class etage:
 
 
 
-    def remplir_terrain_salles():
+    def remplir_terrain_salles(self):
         for i in range(len(salles)):
             # on rentre va afficher la salle i : 
             x,y = salles[i][0], salles[i][1]
