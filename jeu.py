@@ -1,13 +1,13 @@
 import numpy as np
 import pygame as pg 
 
-
+pg.init()
 salles = [(0,0,7,4), (6,5,5,6), (12,4,6,7)]
 couloirs = [ [(2,3),(2,8),(4,8),(4,7),(6,7)] , [(8,5),(8,1),(14,1),(14,4)] , [(10,8),(11,8),(11,7),(12,7)]]
 ennemies = set()
 objets = set()
-taille_x = 20
-taille_y = 20
+taille_x = 18
+taille_y = 11
 
 
 class player:
@@ -186,3 +186,5 @@ while running:
                 valeur = player.afficher_player()
                 display(player.niveau.etage.terrain)
                 player.remettre(valeur)
+
+pg.quit()
