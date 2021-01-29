@@ -1,10 +1,14 @@
 import numpy as np
 import pygame as pg 
 
-niveaux = [niveau(0,etage(salles,couloirs),{},set())]
+
 salles = [(0,0,7,4), (6,5,5,6), (12,4,6,7)]
 couloirs = [ [(2,3),(2,8),(4,8),(4,7),(6,7)] , [(8,5),(8,1),(14,1),(14,4)] , [(10,8),(11,8),(11,7),(12,7)]]
-joueur = player(100, 0,set(), 0, [0,[1,1]]) #position contient la donnée du niveau et de la position du joueur dans la matrice
+ennemies = set()
+objets = set()
+taille_x = 20
+taille_y = 20
+
 
 class player:
 
@@ -34,11 +38,22 @@ class player:
     def augmenterLevel(self):
         self.level += 1
     
-    def deplacement(self, move) # move est une liste de deux éléments (ex : [1,0] si on se déplace à droite)
+    def deplacement(self, move): # move est une liste de deux éléments (ex : [1,0] si on se déplace à droite)
         if estPosstibleDeplacement(move):
-            position[0]+=move[0]
-            position[1]+=move[1]
+            self.position[0]+=move[0]
+            self.position[1]+=move[1]
+        
     
+    def afficher_player(self): # Renvoie la valeur qui était à l'endroit position pour la garder en mémoire 
+        a, b = self.position[0], self.position[0]
+        valeur = self.niveau.etage.terrain[a][b]
+        self.niveau.etage.terrain[a][b] = 4
+        return valeur
+    
+    def remettre(self,valeur):
+        a, b = self.position[0], self.position[1]
+        self.niveau.etage.terrain[a][b] = valeur
+
 
     # ATTENTION appeler la fonction remplir terrain couloir APRES remplir terrain salle
 
@@ -66,7 +81,7 @@ def display(terrain):
 
 
 class niveau:
-    def __init__(self, etage, objets, ennemies, taille_x, taille_y, salles, couloirs):
+    def __init__(self, objets, ennemies, taille_x, taille_y, salles, couloirs):
         self.etage = etage(salles, couloirs)
         self.objets = objets
         self.ennemies = ennemies
@@ -78,6 +93,8 @@ class etage:
         # 0 fait rien, 1 c'est . , 2 c'est -, 3 c'est |, 4 c'est @, 5 c'est couloir, 6 c'est porte
         self.salles = salles
         self.couloirs = couloirs
+        self.remplir_terrain_salles()
+        self.remplir_terrain_couloir()
 
     def remplir_terrain_couloir(self):
         #indice va commencer à 0 et finir un indice avant l'indice de fin d'un couloir
@@ -130,13 +147,16 @@ class etage:
                 self.terrain[x + l][y] = 2
                 self.terrain[x + l][y + salles[i][3] - 1] = 2
                 # on a mis les -
-            for h in range(sallles[i][3]):
+            for h in range(salles[i][3]):
                 self.terrain[x][y + h] = 3
                 self.terrain[x + salles[i][2] - 1][y+h] = 3
     
 
 
+joueur = player(100, 0,set(), 0, [1,1], objets, ennemies, taille_x, taille_y, salles, couloirs) 
+
 clock = pg.time.Clock()
+running = True
 while running:
     clock.tick(50)
 
@@ -145,17 +165,24 @@ while running:
             if event.key == pg.K_DOWN:
                 direction = [0,1]
                 player.deplacement(direction)
-
-                display(niveau.etage.terrain)
+                valeur = player.afficher_player()
+                display(player.niveau.etage.terrain)
+                player.remettre(valeur)
             elif event.key == pg.K_UP:
                 direction = [0,-1]
                 player.deplacement(direction)
-                display(niveau.etage.terrain)
+                valeur = player.afficher_player()
+                display(player.niveau.etage.terrain)
+                player.remettre(valeur)
             elif event.key == pg.K_LEFT:
                 direction = [-1,0]
                 player.deplacement(direction)
-                display(niveau.etage.terrain)
+                valeur = player.afficher_player()
+                display(player.niveau.etage.terrain)
+                player.remettre(valeur)
             elif event.key == pg.K_RIGHT:
                 direction = [1,0]
                 player.deplacement(direction)
-                display(niveau.etage.terrain)
+                valeur = player.afficher_player()
+                display(player.niveau.etage.terrain)
+                player.remettre(valeur)
