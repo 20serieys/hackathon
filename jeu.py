@@ -1,4 +1,10 @@
 import numpy as np
+import pygame as pg 
+
+niveaux = [niveau(0,etage(salles,couloirs),{},set())]
+salles = [(0,0,7,4), (6,5,5,6), (12,4,6,7)]
+couloirs = [ [(2,3),(2,8),(4,8),(4,7),(6,7)] , [(8,5),(8,1),(14,1),(14,4)] , [(10,8),(11,8),(11,7),(12,7)]]
+joueur = player(100, 0,set(), 0, [0,[1,1]]) #position contient la donnée du niveau et de la position du joueur dans la matrice
 
 class player:
 
@@ -108,10 +114,29 @@ class etage:
             for h in range(sallles[i][3]):
                 self.terrain[x][y + h] = 3
                 self.terrain[x + salles[i][2] - 1][y+h] = 3
-
-            
-
     
 
-salles = [(0,0,7,4), (6,5,5,6), (12,4,6,7)]
-couloirs = [ [(2,3),(2,8),(4,8),(4,7),(6,7)] , [(8,5),(8,1),(14,1),(14,4)] , [(10,8),(11,8),(11,7),(12,7)]]
+
+clock = pg.time.Clock()
+while running:
+    clock.tick(50)
+
+    for event in pg.event.get():
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_DOWN:
+                direction = [0,1]
+                player.deplacement(direction)
+
+                display(niveau.etage.terrain)
+            elif event.key == pg.K_UP:
+                direction = [0,-1]
+                player.deplacement(direction)
+                display(niveau.etage.terrain)
+            elif event.key == pg.K_LEFT:
+                direction = [-1,0]
+                player.deplacement(direction)
+                display(niveau.etage.terrain)
+            elif event.key == pg.K_RIGHT:
+                direction = [1,0]
+                player.deplacement(direction)
+                display(niveau.etage.terrain)
