@@ -6,8 +6,8 @@ salles = [(0,0,7,4), (6,5,5,6), (12,4,6,7)]
 couloirs = [ [(2,3),(2,8),(4,8),(4,7),(6,7)] , [(8,5),(8,1),(14,1),(14,4)] , [(10,8),(11,8),(11,7),(12,7)]]
 ennemies = set()
 objets = set()
-taille_x = 18
-taille_y = 11
+taille_x = 20
+taille_y = 20
 
 
 class player:
@@ -22,7 +22,7 @@ class player:
     
     def estPosstibleDeplacement(self,direction):
         i, j = np.array(self.position) + np.array(direction)
-        if self.niveau.etage.terrain[i][j] in [0,1]:
+        if self.niveau.etage.terrain[i][j] in [1,5,6]:
             return True
         return False
 
@@ -45,7 +45,7 @@ class player:
         
     
     def afficher_player(self): # Renvoie la valeur qui était à l'endroit position pour la garder en mémoire 
-        a, b = self.position[0], self.position[0]
+        a, b = self.position[0], self.position[1]
         valeur = self.niveau.etage.terrain[a][b]
         self.niveau.etage.terrain[a][b] = 4
         return valeur
@@ -129,7 +129,7 @@ class etage:
                     x = self.couloirs[i][j][1]
                     diff = y_2 - y_1
                     for k in range(diff + 1):
-                        self.terrain[x][y_1 + k] = 6
+                        self.terrain[x][y_1 + k] = 5
             # il reste à mettre les portes
             a_1 = self.couloirs[i][0][0]
             a_2 = self.couloirs[i][0][1]
@@ -177,9 +177,10 @@ while running:
                 direction = [-1,0]
             elif event.key == pg.K_RIGHT:
                 direction = [1,0]
-            joueur.deplacement(direction)
-            valeur = joueur.afficher_player()
-            display(joueur.niveau.etage.terrain)
-            joueur.remettre(valeur)
+            if joueur.estPosstibleDeplacement:
+                joueur.deplacement(direction)
+                valeur = joueur.afficher_player()
+                display(joueur.niveau.etage.terrain)
+                joueur.remettre(valeur)
 
 pg.quit()
