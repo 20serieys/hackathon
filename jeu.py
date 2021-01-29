@@ -12,7 +12,7 @@ class player:
 
 
 class niveau:
-    def __init__(etage, objets, ennemies, taille):
+    def __init__(etage, objets, ennemies, taille_x, taille_y):
         self.etage = etage
         self.objets = objets
         self.ennemies = ennemies
@@ -20,7 +20,7 @@ class niveau:
 
 class etage:
     def __init__(salles, couloirs):
-        self.terrain = [[O for i in range(taille)] for j in range(taille)]
+        self.terrain = [[O for i in range(taille_y)] for j in range(taille_x)]
         # 0 fait rien, 1 est un point, 2 c'est -, 3 c'est |, 4 c'est @,...
         self.salles = salles
         self.couloirs = couloirs
