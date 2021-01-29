@@ -13,8 +13,6 @@ class player:
 
 class niveau:
     def __init__(etage, objets, ennemies, taille):
-        self.terrain = [[O for i in range(taille)] for j in range(taille)]
-        # 0 fait rien, 1 est un point, 2 c'est -, 3 c'est |, 4 c'est @,...
         self.etage = etage
         self.objets = objets
         self.ennemies = ennemies
@@ -22,6 +20,33 @@ class niveau:
 
 class etage:
     def __init__(salles, couloirs):
+        self.terrain = [[O for i in range(taille)] for j in range(taille)]
+        # 0 fait rien, 1 est un point, 2 c'est -, 3 c'est |, 4 c'est @,...
         self.salles = salles
         self.couloirs = couloirs
+
+    def remplir_terrain_couloir:
+        pass
+
+    def remplir_terrain_salles:
+        for i in range(len(salles)):
+            # on rentre va afficher la salle i : 
+            x,y = salles[i][0], salles[i][1]
+            for l in range(salles[i][2]):
+                for h in range(salles[i][3]):
+                    self.terrain[x + l][y + h] = 1 # on met des points partout dans la salle
+            # il reste à mettre les - et |
+            for l in range(salles[i][2]):
+                self.terrain[x + l][y] = 2
+                self.terrain[x + l][y + salles[i][3]] = 2
+                # on a mis les -
+            for h in range(sallles[i][3]):
+                self.terrain[x][y + h] = 3
+                self.terrain[x + salles[i][2]][y+h] = 3
+
+            
+
     
+
+salles = [(0,0,7,4), (6,5,5,6), (12,4,6,7)]
+couloirs = [ [(2,3),(2,8),(4,8),(4,7),(6,7)] , [(8,5),(8,1),(14,1),(14,4)] , [(10,8),(11,8),(11,7),(12,7)]]
