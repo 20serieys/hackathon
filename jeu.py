@@ -20,7 +20,7 @@ class player:
         self.position = position
         self.niveau = niveau(objets,ennemies,taille_x,taille_y, salles, couloirs)
     
-    def can_move(self,direction):
+    def estPosstibleDeplacement(self,direction):
         i, j = np.array(self.position) + np.array(direction)
         if self.niveau.etage.terrain[i][j] in [0,1]:
             return True
@@ -39,7 +39,7 @@ class player:
         self.level += 1
     
     def deplacement(self, move): # move est une liste de deux éléments (ex : [1,0] si on se déplace à droite)
-        if estPosstibleDeplacement(move):
+        if self.estPosstibleDeplacement(move):
             self.position[0]+=move[0]
             self.position[1]+=move[1]
         
@@ -58,25 +58,30 @@ class player:
     # ATTENTION appeler la fonction remplir terrain couloir APRES remplir terrain salle
 
 def display(terrain):
-    k, l = terrain.shape()
+    k,l = terrain.shape
     for i in range(k):
-        chaine = ''
         for j in range(l):
+            x = 10*i
+            y = 10*j
+            width = 10
+            height = 10
+            rect = pg.Rect(x,y,width,height)
             if terrain[i][j] == 0:
-                chaine = chaine + ' '
+                color = (0,0,0)
             if terrain[i][j] == 1:
-                chaine = chaine + '.'
+                color = (255,255,255)
             if terrain[i][j] == 2:
-                chaine = chaine + '_'
+                color = (255,0,0)
             if terrain[i][j] == 3:
-                chaine = chaine + '|'
+                color = (255,0,0)
             if terrain[i][j] == 4:
-                chaine = chaine + '@'
+                color = (0,255,0)
             if terrain[i][j] == 5:
-                chaine = chaine + '#'
+                color = (255,128,0)
             if terrain[i][j] == 6:
-                chaine = chaine + '+'
-        print(chaine)
+                color = (0,0,255)
+            pg.draw.rect(screen,color,rect)
+    pg.display.update()
     
 
 
@@ -155,6 +160,8 @@ class etage:
 
 joueur = player(100, 0,set(), 0, [1,1], objets, ennemies, taille_x, taille_y, salles, couloirs) 
 
+screen = pg.display.set_mode((taille_x*10, taille_y*10))
+
 clock = pg.time.Clock()
 running = True
 while running:
@@ -164,27 +171,15 @@ while running:
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_DOWN:
                 direction = [0,1]
-                player.deplacement(direction)
-                valeur = player.afficher_player()
-                display(player.niveau.etage.terrain)
-                player.remettre(valeur)
             elif event.key == pg.K_UP:
                 direction = [0,-1]
-                player.deplacement(direction)
-                valeur = player.afficher_player()
-                display(player.niveau.etage.terrain)
-                player.remettre(valeur)
             elif event.key == pg.K_LEFT:
                 direction = [-1,0]
-                player.deplacement(direction)
-                valeur = player.afficher_player()
-                display(player.niveau.etage.terrain)
-                player.remettre(valeur)
             elif event.key == pg.K_RIGHT:
                 direction = [1,0]
-                player.deplacement(direction)
-                valeur = player.afficher_player()
-                display(player.niveau.etage.terrain)
-                player.remettre(valeur)
+            joueur.deplacement(direction)
+            valeur = joueur.afficher_player()
+            display(joueur.niveau.etage.terrain)
+            joueur.remettre(valeur)
 
 pg.quit()
