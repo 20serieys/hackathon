@@ -21,12 +21,14 @@ class niveau:
 class etage:
     def __init__(salles, couloirs):
         self.terrain = [[O for i in range(taille_y)] for j in range(taille_x)]
-        # 0 fait rien, 1 est un point, 2 c'est -, 3 c'est |, 4 c'est @,...
+        # 0 fait rien, 1 c'est . , 2 c'est -, 3 c'est |, 4 c'est @, 5 c'est couloir, 6 c'est porte
         self.salles = salles
         self.couloirs = couloirs
 
     def remplir_terrain_couloir:
-        pass
+        #indice va commencer à 0 et finir un indice avant l'indice de fin d'un couloir
+        def indice_qui change(indice_couloir, indice_virage):
+            x_1 = self.couloirs[]
 
     def remplir_terrain_salles:
         for i in range(len(salles)):
@@ -38,11 +40,11 @@ class etage:
             # il reste à mettre les - et |
             for l in range(salles[i][2]):
                 self.terrain[x + l][y] = 2
-                self.terrain[x + l][y + salles[i][3]] = 2
+                self.terrain[x + l][y + salles[i][3] - 1] = 2
                 # on a mis les -
             for h in range(sallles[i][3]):
                 self.terrain[x][y + h] = 3
-                self.terrain[x + salles[i][2]][y+h] = 3
+                self.terrain[x + salles[i][2] - 1][y+h] = 3
 
             
 
